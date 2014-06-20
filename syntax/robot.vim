@@ -10,6 +10,9 @@ endif
 let s:cpo_save = &cpo
 set cpo&vim
 
+" TODO use sync region to reduce overhead of syncing
+syn sync fromstart
+
 let s:sep = '\( \)\{2,}'
 execute 'syn match robotSep '.string(s:sep)
 
@@ -54,34 +57,34 @@ syn match robotCommonSet  contained  "\c\[\(Documentation\|Timeout\)\]"
 " Testcase settings
 syn match robotTestCasesHeader contained "\c^\(\*\+\)\s*\(test cases\)\s*\1"
 syn match robotTestcaseSet contained "\c\[\(Tags\|Setup\|Teardown\|Precondition\|Postcondition\|Template\)\]"
-syn region robotTestCasesBlock start="\c^\(\*\+\)\s*\(test cases\)\s*\1" end="^\*\+"me=s-1 contains=robotKeywordName,robotCommonSet,robotTestcaseSet,robotTestCasesHeader
+syn region robotTestCasesBlock start="\c^\(\*\+\)\s*\(test cases\)\s*\1" end="^\*\+"me=s-1 contains=robotKeywordName,robotCommonSet,robotTestcaseSet,robotTestCasesHeader,robotScalarVariable,robotListVariable,robotComment,robotStatement,robotCommonSet,robotFillerBackslash
 
 " Settings (global)
 let s:settings_section_start = ""
 syn match robotSetup        contained "\c\(Suite\|Test\) \(Setup\|Teardown\|Precondition\|Postcondition\)"
 syn match robotSettings     contained "\c\(Library\|Resource\|Variables\|Documentation\|Metadata\|Force Tags\|Default Tags\|Test Template\|Test Timeout\)"
 syn match robotSettingsHeader contained "\c^\(\*\+\)\s*\(settings\)\s*\1"
-syn region robotSettingsTable start="\c^\(\*\+\)\s*\(settings\)\s*\1" end="^\*\+"me=s-1 contains=robotSetup,robotSettings,robotSettingsHeader,robotComment,robotEllipsis
+syn region robotSettingsTable start="\c^\(\*\+\)\s*\(settings\)\s*\1" end="^\*\+"me=s-1 contains=robotSetup,robotSettings,robotSettingsHeader,robotComment,robotEllipsis,robotScalarVariable,robotListVariable,robotComment,robotString,robotFillerBackslash
 
 " Keywords
 syn match robotKeywordSet contained  "\c\[\(Arguments\|Return\)\]"
 syn match robotKeywordsHeader contained "\c\(\*\+\)\s*\(user \)\?keywords\s*\1$"
 syn match robotKeywordName contained '^\(\w \?\)\+'
-syn region robotKeywordsTable start="\c\(\*\+\)\s*\(user \)\?keywords\s*\1$" end="^\*\+"me=s-1 contains=robotKeywordSet,robotKeywordsHeader,robotKeywordName
+syn region robotKeywordsTable start="\c\(\*\+\)\s*\(user \)\?keywords\s*\1$" end="^\*\+"me=s-1 contains=robotKeywordSet,robotKeywordsHeader,robotKeywordName,robotScalarVariable,robotListVariable,robotComment,robotStatement,robotCommonSet,robotString,robotEllipsis,robotFillerBackslash
 
 " Variables
 syn match robotVariablesHeader contained "\c\(\*\+\)\s*\(variables\)\s*\1$"
-syn region robotVariablesTable start="\c^\(\*\+\)\s*\(variables\)\s*\1" end="^\*\+"me=s-1
+syn region robotVariablesTable start="\c^\(\*\+\)\s*\(variables\)\s*\1" end="^\*\+"me=s-1 contains=robotKeywordSet,robotVariablesHeader,robotScalarVariable,robotListVariable,robotComment,robotString,robotEllipsis,robotFillerBackslash
 
 " Single-line comments
 syn keyword robotTodo contained TODO FIXME XXX NOTE
 syn match robotComment "#.*$" contains=robotTodo
 
 " Constants/strings
-syn region robotString          start='"' excludenl end='"'
+syn region robotString          start='"' excludenl end='"' contains=robotScalarVariable,robotListVariable
 syn match robotEllipsis         display "\.\.\."
 syn match robotPath             display "\(\.\{1,2}\/\)\=\(\(\h\|\d\)\+\/\)\+\(\(\h\|\d\)\+\.\h\+\)\{,1}$"
-
+execute 'syn match robotFillerBackslash contained "'.s:sep.'\\'.s:sep.'"'
 
 " Statements
 syn match robotStatement '\<\(IN\|IN RANGE\)\>'
@@ -98,6 +101,7 @@ hi def link   robotKeywordsHeader   Special
 hi def link   robotSettingsHeader   Special
 hi def link  robotTestCasesHeader   Special
 hi def link  robotVariablesHeader   Special
+hi def link  robotFillerBackslash   Special
 hi def link            robotSetup   Include
 hi def link         robotSettings   Include
 hi def link           robotImport   Include
