@@ -61,10 +61,20 @@ syn region robotTestCasesBlock start="\c^\(\*\+\)\s*\(test cases\)\s*\1" end="^\
 
 " Settings (global)
 let s:settings_section_start = ""
+syn case ignore
+syn match robotLibraryKeyword contained "\c^\(\s*\)Library"
 syn match robotSetup        contained "\c\(Suite\|Test\) \(Setup\|Teardown\|Precondition\|Postcondition\)"
-syn match robotSettings     contained "\c\(Library\|Resource\|Variables\|Documentation\|Metadata\|Force Tags\|Default Tags\|Test Template\|Test Timeout\)"
+syn match robotLibraryWithName contained "\cwith name"
+syn region robotLibrarySettings  contained matchgroup=robotKeyword start="\c^\(\s*\)Library" skip="^\s*\(\.\.\.\|\#\)" matchgroup=NONE end="^" contains=robotLibraryWithName
+syn case match
+
+
+syn region robotSetting matchgroup=robotKeyword start="\c^\(\s*\)\(Library\|Resource\)" skip="^\s*\(\.\.\.\|\#\)" matchgroup=NONE end="^" containedin=robotSettingsTable
+
+
+syn match robotSettings     contained "\c^\(\s*\)\(Resource\|Variables\|Documentation\|Metadata\|Force Tags\|Default Tags\|Test Template\|Test Timeout\)"
 syn match robotSettingsHeader contained "\c^\(\*\+\)\s*\(settings\)\s*\1"
-syn region robotSettingsTable start="\c^\(\*\+\)\s*\(settings\)\s*\1" end="^\*\+"me=s-1 contains=robotSetup,robotSettings,robotSettingsHeader,robotComment,robotEllipsis,robotScalarVariable,robotListVariable,robotComment,robotString,robotFillerBackslash
+syn region robotSettingsTable start="\c^\(\*\+\)\s*\(settings\)\s*\1" end="^\*\+"me=s-1 contains=robotSetup,robotSettings,robotSettingsHeader,robotComment,robotEllipsis,robotScalarVariable,robotListVariable,robotComment,robotString,robotFillerBackslash,robotLibrarySettings,robotStatement
 
 " Keywords
 syn match robotKeywordSet contained  "\c\[\(Arguments\|Return\)\]"
@@ -87,37 +97,39 @@ syn match robotPath             display "\(\.\{1,2}\/\)\=\(\(\h\|\d\)\+\/\)\+\(\
 execute 'syn match robotFillerBackslash contained "'.s:sep.'\\'.s:sep.'"'
 
 " Statements
-syn match robotStatement '\<\(IN\|IN RANGE\)\>'
-syn match robotStatement ':FOR'
-
+syn match robotStatement '\c\<\(IN\|IN RANGE\)\>'
+syn match robotStatement '\c:FOR'
 
 
 hi def link          robotComment   Comment
 hi def link          robotBuiltin   Comment
 hi def link             robotPath   Constant
-hi def link     robotTestCaseName   Underlined
-hi def link      robotKeywordName   Underlined
+hi def link           robotNumber   Constant
+hi def link         robotEllipsis   Constant
+hi def link           robotString   Constant
+hi def link     robotTestCaseName   Identifier
+hi def link      robotKeywordName   Identifier
+hi def link            robotSetup   PreProc
+hi def link         robotSettings   PreProc
+hi def link          robotKeyword   PreProc
+hi def link           robotImport   PreProc
 hi def link   robotKeywordsHeader   Special
 hi def link   robotSettingsHeader   Special
 hi def link  robotTestCasesHeader   Special
 hi def link  robotVariablesHeader   Special
 hi def link  robotFillerBackslash   Special
-hi def link            robotSetup   Include
-hi def link         robotSettings   Include
-hi def link           robotImport   Include
-hi def link        robotCommonSet   Keyword
-hi def link       robotKeywordSet   Keyword
-hi def link      robotTestcaseSet   Keyword
-hi def link       seleniumLibrary   Keyword
-hi def link           robotNumber   Number
-hi def link         robotOperator   Operator
 hi def link          robotSpecial   Special
 hi def link        robotStatement   Statement
-hi def link         robotEllipsis   String
-hi def link           robotString   String
+hi def link        robotCommonSet   Statement
+hi def link       robotKeywordSet   Statement
+hi def link      robotTestcaseSet   Statement
+hi def link       seleniumLibrary   Statement
+hi def link         robotOperator   Statement
+hi def link  robotLibraryWithName   Statement
 hi def link             robotTodo   Todo
 hi def link   robotScalarVariable   Type
 hi def link     robotListVariable   Type
+hi def link   robotLibraryKeyword   Type
 
 let b:current_syntax = "robot"
 "------------------------------------------------------------------------
